@@ -10,51 +10,62 @@ import com.api.entity.Student;
 
 @Repository
 public class StudentDao {
-    
+
 	@Autowired
 	SessionFactory fact;
-	
+
 	public String InsertData(Student s) {
 		
-		Session ss = fact.openSession();
-	    Transaction tr = ss.beginTransaction();
-	    ss.persist(s);
+		Session ss = null;
+		Transaction tr = null;
+		String msg = null;
+		
+		try {
+		 ss = fact.openSession();
+	     tr = ss.beginTransaction();
+	     ss.persist(s);
+	     tr.commit();
 	    
-	    ss.close();
-	    tr.commit();
-	    
-	    return "data inserted.....";
-	
-	
+	     msg = "data inserted.....";
+		}catch(Exception e) {
+			if(tr != null) {
+				tr.rollback();
+			}
+		}finally {
+			if(ss != null) {
+				ss.close();
+			}
+		}
+	    return msg;
 	}
-	
+
 	public String DeleteData(int Stud_ID) {
 		Session ss = fact.openSession();
-	    Transaction tr = ss.beginTransaction();
-	    
-	    Student s = ss.get(Student.class, Stud_ID);
-	
-	    ss.remove(s);
-	
-	    tr.commit();
-	    
-	    ss.close();
-	    
-	    return "Data deleted succesfully.....";
+		Transaction tr = ss.beginTransaction();
+
+		Student s = ss.get(Student.class, Stud_ID);
+
+		ss.remove(s);
+
+		tr.commit();
+
+		ss.close();
+
+		return "Data deleted succesfully.....";
 	}
-	
+
 	public String UpdateData(int Stud_ID) {
 		Session ss = fact.openSession();
-	    Transaction tr = ss.beginTransaction();
-	    
-	    Student s = ss.get(Student.class, Stud_ID);
-	    
-	    ss.merge(s);
-	    
-	    tr.commit();
-	    ss.close();
-	    
-	    return "Data updated succesfully.....";
-	
+		Transaction tr = ss.beginTransaction();
+
+		Student s = ss.get(Student.class, Stud_ID);
+
+		ss.merge(s);
+
+		tr.commit();
+		ss.close();
+
+		return "Data updated succesfully.....";
+
 	}
 }
